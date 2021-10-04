@@ -44,6 +44,27 @@
     <Compile Include="PlcTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Alberts\AlbertsAutomat.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Alberts\AlbertsComponents.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Alberts\AlbertsMachine.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Alberts\AlbertsContext.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Alberts\AlbertsSettings.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Alberts\Recipe.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Alberts\AlbertsDataManager.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\AppContext.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -93,6 +114,7 @@
     <Folder Include="Misc" />
     <Folder Include="Misc\Checkers" />
     <Folder Include="POUs\Data" />
+    <Folder Include="POUs\Alberts" />
     <Folder Include="POUs\Station001" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />

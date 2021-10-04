@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+  <POU Name="AlbertsComponents" Id="{f834699d-2686-06e9-1278-871bbcae7b93}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute wpf [Container(Layout.Stack)]}
+FUNCTION_BLOCK AlbertsComponents EXTENDS TcoCore.TcoObject
+VAR	
+//	_horizontalAxis : DriveSim(THIS^);
+	{attribute addProperty Name "Horizontal axis"}
+	_horizontalNcAxis : TcoDrivesBeckhoff.TcoDriveSimple(THIS^); 
+	{attribute addProperty Name "Vertical piston"}
+	_verticalPiston : TcoPneumatics.TcoCylinder(THIS^);
+	{attribute addProperty Name "Gripper piston"}
+	_gripperPiston : TcoPneumatics.TcoCylinder(THIS^);
+END_VAR
+(* Simulation variables *)
+VAR
+	_counterSimVerticalPiston : ULINT;
+	_counterSimGripperPiston : ULINT;
+	_simulationCycleVerticalPiston : BOOL;	
+	_simulationCycleGripperPiston : BOOL;	
+	_verticalPosition : INT;
+	_gripperPosition : INT;
+	_dimXsim : RealValueSimulation;
+	_dimYsim : RealValueSimulation;
+	_dimZsim : RealValueSimulation;
+	_dimX : REAL;
+	_dimY : REAL;
+	_dimZ : REAL;
+END_VAR
+VAR CONSTANT
+	_verticalPistonStroke : INT := 150;
+	_gripperPistonStroke : INT := 50;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

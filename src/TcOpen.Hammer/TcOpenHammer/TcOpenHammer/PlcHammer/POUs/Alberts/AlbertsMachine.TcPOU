@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+  <POU Name="AlbertsMachine" Id="{5b991b17-c4f5-0206-3497-33df35fde26a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK AlbertsMachine EXTENDS TcoCore.TcoObject 
+VAR
+	Automat : AlbertsAutomat(THIS^,eRestoreMode.None);
+	Components : AlbertsComponents(THIS^);
+	_name :STRING;
+	_technologicalDataManager : AlbertsDataManager(THIS^);
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Automat.Run();
+_technologicalDataManager();]]></ST>
+    </Implementation>
+    <Property Name="Name" Id="{bf1dc4ef-e185-055f-1d35-720b5c79a95e}">
+      <Declaration><![CDATA[PROPERTY Name : String]]></Declaration>
+      <Get Name="Get" Id="{34481917-a0c7-0533-1fba-642318e16213}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[	]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="TechnologicalDataManager" Id="{17ae5308-03f2-0215-28b2-6f7448a51b6b}">
+      <Declaration><![CDATA[PROPERTY TechnologicalDataManager : REFERENCE TO AlbertsDataManager]]></Declaration>
+      <Get Name="Get" Id="{69297e09-9ee4-09c7-1a1e-5dc766d9637f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[TechnologicalDataManager REF= _technologicalDataManager;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>

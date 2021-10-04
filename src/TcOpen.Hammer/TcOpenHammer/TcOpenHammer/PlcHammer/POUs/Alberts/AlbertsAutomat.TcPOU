@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.5">
+  <POU Name="AlbertsAutomat" Id="{5c747296-4d89-06e0-20d1-7356fa0590c1}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK AlbertsAutomat EXTENDS TcoCore.TcoSequencer
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="Machine" Id="{65c24762-f0c2-0525-390f-f2f728a16cd2}">
+      <Declaration><![CDATA[PROPERTY Machine : REFERENCE TO AlbertsMachine]]></Declaration>
+      <Get Name="Get" Id="{9d38ae5d-e6e2-0c90-1830-7010eec77929}">
+        <Declaration><![CDATA[VAR
+    _station : POINTER TO AlbertsMachine;
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF __QUERYPOINTER(_Parent,_station) THEN // Check if _Parent is Machine
+	Machine REF= _station^;              // If the check is successful dereference a pointer. simlar to THIS^ or SUPER^
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Main" Id="{db7b87f8-6eb1-0ece-294d-6e9c76ce28f5}">
+      <Declaration><![CDATA[(*~
+	<docu>
+		<summary>
+			Main method of the sequener. Custom code needs to be placed here. The sequencer is executed by call of InstanceName.Run() method.
+			This method is abstract, and it must be overridden in derived block.
+		</summary>
+	</docu>
+~*)
+METHOD PROTECTED  Main : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+IF (Step(0, TRUE, 'LOAD TECHNOLOGICAL SETTINGS')) THEN
+    //--------------------------------------------
+    StepCompleteWhen(Machine.TechnologicalDataManager.Read('default').Done);
+    //--------------------------------------------	
+END_IF;
+
+IF (Step(50, TRUE, 'LOAD PRECESS SETTINGS')) THEN
+    //--------------------------------------------
+   StepCompleteWhen(true);
+    //--------------------------------------------	
+END_IF;
+
+
+
+IF (Step(1000, TRUE, 'SEUQNCE COMPLETE')) THEN
+    //--------------------------------------------
+    CompleteSequence();
+    //--------------------------------------------	
+END_IF;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

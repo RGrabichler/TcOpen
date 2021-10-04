@@ -61,10 +61,15 @@ namespace PlcHammer.Hmi.Blazor
             services.AddVortexBlazorSecurity(userRepo, roleRepo);
 
             /*Json repositories for data*/
-            SetUpJsonRepositories();
+            //SetUpJsonRepositories();
 
             /*Mongo repositories for data*/
-            //SetUpMongoDatabase();
+            SetUpMongoDatabase();
+            Entry.PlcHammer.TECH_MAIN.Alberts.Machine._technologicalDataManager.InitializeRepository(
+                new MongoDbRepository<PlainAlbertsSettings>(
+                    new MongoDbRepositorySettings<PlainAlbertsSettings>("mongodb://localhost:27017", "Alberts", "TechnologySetttings")                    )
+            );
+            Entry.PlcHammer.TECH_MAIN.Alberts.Machine._technologicalDataManager.InitializeRemoteDataExchange();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -116,6 +121,7 @@ namespace PlcHammer.Hmi.Blazor
 
             Entry.PlcHammer.TECH_MAIN._app._station001._technologicalDataManager.InitializeRepository(technologyDataRepository);
             Entry.PlcHammer.TECH_MAIN._app._station001._technologicalDataManager.InitializeRemoteDataExchange();
+
         }
 
         private static void SetUpJsonRepositories()
