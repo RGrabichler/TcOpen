@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FeederTags_Components" Id="{98da1027-e2ea-0828-0272-ce60701622d2}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute wpf [Container(Layout.UniformGrid)]}
+FUNCTION_BLOCK FeederTags_Components EXTENDS TcoObject
+VAR
+    {attribute addProperty Name "Vorschub Zylinder links"}
+    _feedingZyl : TcoPneumatics.TcoCylinder(THIS^); //horizontal Bewegung
+    {attribute addProperty Name "Fixier Zylinder links"}
+    _fixZylLeft : TcoPneumatics.TcoCylinder(THIS^); //Fixierung nach Vorschub
+        {attribute addProperty Name "Fixier Zylinder rechts"}
+    _fixZylRight : TcoPneumatics.TcoCylinder(THIS^); //Fixierung nach Vorschub
+    {attribute addProperty Name "Rechen Zylinder links"}
+    _clampZylLeft : TcoPneumatics.TcoCylinder(THIS^); //Klemmung zum Vorschub
+        {attribute addProperty Name "Rechen Zylinder rechts"}
+    _clampZylRight : TcoPneumatics.TcoCylinder(THIS^); //Klemmung zum Vorschub
+END_VAR
+(* Simulation variables *)
+VAR
+    {attribute clr [RenderIgnore()]}
+    _counterSim_feedingZyl : LINT;
+    {attribute clr [RenderIgnore()]}
+    _counterSim_fixZyl : LINT;
+    {attribute clr [RenderIgnore()]}
+    _counterSim_clampZyl : LINT;
+    {attribute clr [RenderIgnore()]}
+    _simulationCycle_feedingZyl : BOOL;
+    {attribute clr [RenderIgnore()]}
+    _simulationCycle_fixZyl : BOOL;
+    {attribute clr [RenderIgnore()]}
+    _simulationCycle_clampZyl : BOOL;
+    {attribute clr [RenderIgnore()]}
+    _feedingZylPosition : INT;
+    {attribute clr [RenderIgnore()]}
+    _fixZylPosition : INT;
+    {attribute clr [RenderIgnore()]}
+    _clampZylPosition : INT;
+
+END_VAR
+VAR CONSTANT
+    {attribute clr [RenderIgnore()]}
+    _feedingZyl_SimStroke : INT := 250;
+    {attribute clr [RenderIgnore()]}
+    _fixZyl_SimStroke : INT := 150;
+    {attribute clr [RenderIgnore()]}
+    _clampZyl_SimStroke : INT := 150;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Simulation();
+
+_feedingZyl(inoAtHomePos := IO.iA1[0],
+    inoAtWorkPos := IO.iA1[1],
+    inoToHomePos := IO.qA1[0],
+    inoToWorkPos := IO.qA1[1]);
+
+_fixZylLeft(inoAtHomePos := IO.iA1[2],
+    inoAtWorkPos := IO.iA1[3],
+    inoToHomePos := IO.qA1[2],
+    inoToWorkPos := IO.qA1[3]);
+
+_clampZylLeft(inoAtHomePos := IO.iA1[4],
+    inoAtWorkPos := IO.iA1[5],
+    inoToHomePos := IO.qA1[4],
+    inoToWorkPos := IO.qA1[5]);]]></ST>
+    </Implementation>
+    <Property Name="ClampZylLeft" Id="{625fe360-7480-017d-2186-d34165c95df1}">
+      <Declaration><![CDATA[PROPERTY ClampZylLeft : reference to TcoPneumatics.TcoCylinder]]></Declaration>
+      <Get Name="Get" Id="{8468f72d-c1d9-01d3-042d-f3ef3a0d6df4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ClampZylLeft ref= _clampZylLeft;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ClampZylRight" Id="{3cb68c8d-f35f-055d-324d-05fe495e16cd}">
+      <Declaration><![CDATA[PROPERTY ClampZylRight : reference to TcoPneumatics.TcoCylinder]]></Declaration>
+      <Get Name="Get" Id="{8eb66dca-52fb-0764-0f5d-89743e7279f9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ClampZylRight Ref= _clampZylRight;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="FeedingZyl" Id="{82f80404-60ff-069c-095c-fede9586812a}">
+      <Declaration><![CDATA[PROPERTY FeedingZyl : reference to TcoPneumatics.TcoCylinder]]></Declaration>
+      <Get Name="Get" Id="{2e76413c-0b4d-0639-3e2b-757bf48927b4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[FeedingZyl ref= _feedingZyl;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="FixZylLeft" Id="{73ad61d7-32f5-037e-0f68-8b5b259f41cc}">
+      <Declaration><![CDATA[PROPERTY FixZylLeft : reference to TcoPneumatics.TcoCylinder]]></Declaration>
+      <Get Name="Get" Id="{2c455d56-35ac-001a-3523-d5d61b99e28d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[FixZylLeft ref= _fixZylLeft;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="FixZylRight" Id="{4ae0a1bc-4d49-07f8-10fc-ee64d0cf952a}">
+      <Declaration><![CDATA[PROPERTY FixZylRight : REFERENCE to TcoPneumatics.TcoCylinder]]></Declaration>
+      <Get Name="Get" Id="{5ca79530-f904-01a3-2232-7d1cdc8e7827}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[FixZylRight REF= _fixZylRight;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Service" Id="{99a09c69-1f7e-098c-2b6b-16da748779b0}">
+      <Declaration><![CDATA[METHOD Service : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_feedingZyl.Service();
+_clampZylLeft.Service();
+_clampZylRight.Service();
+_fixZylLeft.Service();
+_fixZylRight.Service();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Simulation" Id="{c8673ec4-449e-0264-0f1b-e879f5d91bee}">
+      <Declaration><![CDATA[METHOD Simulation : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF (_feedingZyl.MoveHomeTask.Busy OR _feedingZyl.MoveWorkTask.Busy) THEN
+    _counterSim_feedingZyl := _counterSim_feedingZyl + 1;
+    _simulationCycle_feedingZyl := (_counterSim_feedingZyl MOD _feedingZyl_SimStroke) = 0;
+END_IF;
+
+IF (_fixZylLeft.MoveHomeTask.Busy OR _fixZylLeft.MoveWorkTask.Busy) THEN
+    _counterSim_fixZyl := _counterSim_fixZyl + 1;
+    _simulationCycle_fixZyl := (_counterSim_fixZyl MOD _fixZyl_SimStroke) = 0;
+END_IF;
+
+IF (_clampZylLeft.MoveHomeTask.Busy OR _clampZylLeft.MoveWorkTask.Busy) THEN
+    _counterSim_clampZyl := _counterSim_clampZyl + 1;
+    _simulationCycle_clampZyl := (_counterSim_clampZyl MOD _clampZyl_SimStroke) = 0;
+END_IF;
+
+IF (IO.qA1[0] AND _simulationCycle_feedingZyl) THEN
+    IO.iA1[0] := TRUE;
+    IO.iA1[1] := FALSE;
+    _feedingZylPosition := 0;
+END_IF
+
+IF (IO.qA1[1] AND _simulationCycle_feedingZyl) THEN
+    IO.iA1[1] := TRUE;
+    IO.iA1[0] := FALSE;
+    _feedingZylPosition := _feedingZyl_SimStroke;
+END_IF
+
+IF (IO.qA1[0] AND NOT IO.iA1[0]) THEN
+    _feedingZylPosition := (_feedingZylPosition - 1);
+END_IF;
+
+IF (IO.qA1[1] AND NOT IO.iA1[1]) THEN
+    _feedingZylPosition := (_feedingZylPosition + 1);
+END_IF;
+
+IF (IO.qA1[2] AND _simulationCycle_fixZyl) THEN
+    IO.iA1[2] := TRUE;
+    IO.iA1[3] := FALSE;
+    _fixZylPosition := 0;
+END_IF
+
+IF (IO.qA1[3] AND _simulationCycle_fixZyl) THEN
+    IO.iA1[3] := TRUE;
+    IO.iA1[2] := FALSE;
+    _fixZylPosition := _fixZyl_SimStroke;
+END_IF
+
+IF (IO.qA1[2] AND NOT IO.iA1[2]) THEN
+    _fixZylPosition := (_fixZylPosition - 1);
+END_IF;
+
+IF (IO.qA1[3] AND NOT IO.iA1[3]) THEN
+    _fixZylPosition := (_fixZylPosition + 1);
+END_IF;
+
+IF (IO.qA1[4] AND _simulationCycle_clampZyl) THEN
+    IO.iA1[4] := TRUE;
+    IO.iA1[5] := FALSE;
+    _clampZylPosition := 0;
+END_IF
+
+IF (IO.qA1[5] AND _simulationCycle_clampZyl) THEN
+    IO.iA1[5] := TRUE;
+    IO.iA1[4] := FALSE;
+    _clampZylPosition := _clampZyl_SimStroke;
+END_IF
+
+IF (IO.qA1[4] AND NOT IO.iA1[4]) THEN
+    _clampZylPosition := (_clampZylPosition - 1);
+END_IF;
+
+IF (IO.qA1[5] AND NOT IO.iA1[5]) THEN
+    _clampZylPosition := (_clampZylPosition + 1);
+END_IF;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

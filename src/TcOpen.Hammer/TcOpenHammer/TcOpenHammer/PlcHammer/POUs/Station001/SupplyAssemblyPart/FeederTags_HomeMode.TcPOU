@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FeederTags_HomeMode" Id="{3d6ae1f2-a52b-0a1c-03d1-c0fd06ad01ed}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FeederTags_HomeMode EXTENDS TcoCore.TcoSequencer
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Main" Id="{48a6fcbf-0e32-0d9c-34a0-1aa64b898486}">
+      <Declaration><![CDATA[(*~
+	<docu>
+		<summary>
+			Main method of the sequener. Custom code needs to be placed here. The sequencer is executed by call of InstanceName.Run() method.
+			This method is abstract, and it must be overridden in derived block.
+		</summary>
+	</docu>
+~*)
+METHOD PROTECTED Main : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF (step(10, TRUE, 'Restore everything')) THEN
+    Station.Components.FeedingZyl.Restore();
+    Station.Components.FixZylLeft.Restore();
+    Station.Components.FixZylRight.Restore();
+    Station.Components.ClampZylLeft.Restore();
+    Station.Components.ClampZylRight.Restore();
+    StepCompleteWhen(TRUE);
+END_IF
+
+IF (step(100, TRUE, 'Fixierung zu')) THEN
+    station.Components.FixZylLeft.MoveToWork();
+    //    station.Components.FixZylRight.MoveToWork();
+    Station.Components.Messenger.Error('es geht schon wieder los');
+    IF station.Components.FixZylLeft.MoveToWork().Done
+    //AND station.Components.FixZylRight.MoveToWork().Done 
+        THEN
+        StepCompleteWhen(station.Counter MOD 200 = 0);
+    END_IF
+END_IF
+
+IF (step(200, TRUE, 'Klemmungs-Rechen links und rechts auf')) THEN
+    station.Components.ClampZylLeft.MoveToHome();
+    //    station.Components.ClampZylRight.MoveToHome();
+
+    IF station.Components.ClampZylLeft.MoveToHome().Done
+    //AND Station.Components.ClampZylRight.MoveToHome().Done 
+        THEN
+        StepCompleteWhen(station.Counter MOD 200 = 0);
+    END_IF
+
+END_IF
+
+IF (step(300, TRUE, 'Vorschub in Grundstellung')) THEN
+    IF station.Components.FeedingZyl.MoveToHome().Done THEN
+        StepCompleteWhen(station.Counter MOD 200 = 0);
+    END_IF
+END_IF
+
+IF (step(999, TRUE, 'Ende')) THEN
+    CompleteSequence();
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnStepCompleted" Id="{57d8e96f-3c01-058d-3caf-0f2bc5269180}">
+      <Declaration><![CDATA[(*~
+	<docu>
+		<summary>
+			This method is executed upon step completion.
+			This method can be overridden in derived block by custom logic.
+		</summary>			
+	</docu>	
+~*)
+METHOD PROTECTED OnStepCompleted
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[station.Counter := 1;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Station" Id="{1794d057-02ea-054a-06df-acf6ca22ad60}">
+      <Declaration><![CDATA[PROPERTY Station : REFERENCE TO FeederTags]]></Declaration>
+      <Get Name="Get" Id="{e0ec0402-abcd-0107-343f-132a1c56f38d}">
+        <Declaration><![CDATA[VAR
+    _station : POINTER TO FeederTags;
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF __QUERYPOINTER(_Parent, _station) THEN // Check if _Parent is Station001
+    Station REF= _station^; // If the check is successful dereference a pointer. simlar to THIS^ or SUPER^
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>

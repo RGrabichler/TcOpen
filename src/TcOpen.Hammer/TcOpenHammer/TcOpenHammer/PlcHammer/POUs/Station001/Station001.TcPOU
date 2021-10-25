@@ -85,6 +85,15 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+    <Property Name="ComponentsFeederTag" Id="{6ce3751b-ed63-0cc5-1114-4f3bbe9efd2b}">
+      <Declaration><![CDATA[PROPERTY ComponentsFeederTag : reference to FeederTags_Components]]></Declaration>
+      <Get Name="Get" Id="{6d726e5f-f40b-0420-0df7-1f94f05d3329}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ComponentsFeederTag ref= _componentsFeederTag;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="GroundMode" Id="{d9df9b20-93b2-469b-9293-a125a7afb90b}">
       <Declaration><![CDATA[METHOD GroundMode : BOOL
 VAR_INPUT
@@ -164,39 +173,5 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
-    <LineIds Name="Station001">
-      <LineId Id="3" Count="23" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="Station001.AutomatMode">
-      <LineId Id="3" Count="5" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="Station001.Checkers.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="Station001.Components.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="Station001.GroundMode">
-      <LineId Id="3" Count="9" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="Station001.ProcessRecepie.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="Station001.ProcessTraceabilty.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="Station001.ProductionData.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="Station001.ServiceMode">
-      <LineId Id="3" Count="6" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="Station001.TechnologicalDataManager.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
   </POU>
 </TcPlcObject>

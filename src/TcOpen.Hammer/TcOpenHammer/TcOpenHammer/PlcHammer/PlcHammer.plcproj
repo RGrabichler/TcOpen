@@ -53,6 +53,12 @@
     <Compile Include="POUs\Data\RealValueSimulation.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Data\Task Test mit Interlocking\SubRoutine.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Data\Task Test mit Interlocking\SubRoutineAutoMode.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Data\TechnologicalDataManager.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -93,6 +99,8 @@
     <Folder Include="Misc" />
     <Folder Include="Misc\Checkers" />
     <Folder Include="POUs\Data" />
+    <Folder Include="POUs\Data\Task Test mit Interlocking" />
+    <Folder Include="POUs\Data\Task Test mit Interlocking\Station001" />
     <Folder Include="POUs\Station001" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />

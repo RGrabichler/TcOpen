@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FeederTags" Id="{ddef14d8-19f9-04f0-273b-af4df910efa7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FeederTags EXTENDS TcoCore.TcoObject
+VAR
+    _components : FeederTags_Components(THIS^);
+
+    _homeMode : FeederTags_HomeMode(THIS^, eRestoreMode.None);
+    _autoMode : FeederTags_AutoMode(THIS^, eRestoreMode.None);
+
+    _homeModeTask : TcoCore.TcoTask(THIS^);
+    _autoModeTask : TcoCore.TcoTask(THIS^);
+    _serviceModeTask : TcoCore.TcoTask(THIS^);
+
+    _assemblyTask : TcoCore.TcoTask(THIS^);
+
+    _processTraceability : ProcessDataManager(THIS^);
+
+    //Simulation counter
+    _counter : DINT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//SImualtion
+_counter := _counter + 1;
+
+_components();
+_processTraceability();
+
+HomeMode();
+AutoMode();
+ServiceMode();
+
+]]></ST>
+    </Implementation>
+    <Method Name="AssemblySequenc" Id="{429f0cfc-7d7e-0890-277d-d261344bba20}">
+      <Declaration><![CDATA[METHOD AssemblySequenc : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//IF (_assemblyTask.Execute()) THEN
+////    Messenger.Trace('Grundstellungsfahrt aktiv');
+//    _assemblySequence.Run();
+//    _assemblyTask.DoneWhen(_assemblySequence.CurrentStep.ID = 999);
+//END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="AutoMode" Id="{2b27a906-75ff-085b-3206-47a5751ba104}">
+      <Declaration><![CDATA[METHOD AutoMode : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_autoModeTask.Enabled := _homeModeTask.Done;
+
+IF (_autoModeTask.Execute()) THEN
+    Messenger.Trace('Auto Modus aktiv');
+    _serviceModeTask.Abort();
+    _autoMode.Run();
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Components" Id="{76e2992d-231c-0d58-312c-50433fdad69d}">
+      <Declaration><![CDATA[PROPERTY Components : reference to FeederTags_Components]]></Declaration>
+      <Get Name="Get" Id="{d3bedfad-d653-050e-3388-39170c79c79e}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Components ref= _components;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Counter" Id="{0d65ffe9-9746-0daa-3691-8afe7d54e334}">
+      <Declaration><![CDATA[PROPERTY Counter : reference to dint]]></Declaration>
+      <Get Name="Get" Id="{3c4e4cd9-2353-0bfd-1353-39c5656697e7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Counter ref= _counter;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="HomeMode" Id="{b2d0e6f0-ff19-0214-1afd-562a87a316dd}">
+      <Declaration><![CDATA[METHOD HomeMode : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF (_homeModeTask.Execute()) THEN
+    Messenger.Trace('Grundstellungsfahrt aktiv');
+    _autoModeTask.Restore();
+    _serviceModeTask.Restore();
+    _homeMode.Run();
+    _homeModeTask.DoneWhen(_homemode.CurrentStep.ID = 999);
+
+    IF _homeModeTask.Done THEN
+        _homeMode.Restore();
+    END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ProcessTraceAbility" Id="{00f7b12c-b2ca-086c-1a2e-a6922d7e59d1}">
+      <Declaration><![CDATA[PROPERTY ProcessTraceAbility : REFERENCE TO ProcessDataManager]]></Declaration>
+      <Get Name="Get" Id="{be6ddacb-fcc8-0d1b-3923-02d4bb84cc63}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ProcessTraceAbility REF= _processTraceability;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ProductionData" Id="{4fe3bf27-fe79-02bf-1432-19e0065307dc}">
+      <Declaration><![CDATA[PROPERTY ProductionData : Reference to FeederTag_ProductionData]]></Declaration>
+      <Get Name="Get" Id="{bc07ca47-bc4a-0d16-11db-3c9b709ae84a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ProductionData REF= _processTraceability._data;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="ServiceMode" Id="{1933e158-d53e-06b7-2013-f1a463ded5cd}">
+      <Declaration><![CDATA[METHOD ServiceMode : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF(_serviceModeTask.Execute()) THEN
+	Messenger.Trace('Schritt-Modus aktiv');	
+	_autoModeTask.Restore();
+	_homeModeTask.Restore();
+	_homeMode.Restore();
+	_autoMode.Restore();
+	_components.Service();
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

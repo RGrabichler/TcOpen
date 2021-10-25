@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="SubRoutineAutoMode" Id="{0058c801-928e-0439-26d6-184635d0f0ae}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK SubRoutineAutoMode EXTENDS TcoCore.TcoSequencer
+VAR
+    _counter : int :=1 ;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[_counter := _counter + 1;]]></ST>
+    </Implementation>
+    <Method Name="Main" Id="{5b2f8d06-1073-0ba4-0dcc-aceba1450791}">
+      <Declaration><![CDATA[(*~
+	<docu>
+		<summary>
+			Main method of the sequener. Custom code needs to be placed here. The sequencer is executed by call of InstanceName.Run() method.
+			This method is abstract, and it must be overridden in derived block.
+		</summary>
+	</docu>
+~*)
+METHOD PROTECTED Main : BOOL
+VAR_INST
+    simTime : INT := 150;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF (step(100, TRUE, 'SubRoutine Schritt eins, geht los')) THEN
+
+    StepCompleteWhen(station.counter2 MOD simTime = 0);
+
+END_IF
+
+IF (step(200, TRUE, 'Sub ROutine Schritt 2')) THEN
+    StepCompleteWhen(station.counter2 MOD simTime = 0);
+END_IF
+
+IF (step(300, TRUE, ' SubRoutine Schritt 3,')) THEN
+    StepCompleteWhen(station.counter2 MOD simTime = 0);
+END_IF
+
+IF (step(400, TRUE, ' SubRoutine Schritt 4, wird beendet')) THEN
+    ;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnStepCompleted" Id="{0e5655de-6ed3-0060-22cd-3a44463f146c}">
+      <Declaration><![CDATA[(*~
+	<docu>
+		<summary>
+			This method is executed upon step completion.
+			This method can be overridden in derived block by custom logic.
+		</summary>			
+	</docu>	
+~*)
+METHOD PROTECTED OnStepCompleted
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[station.counter2 := 1;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Station" Id="{5420f3c0-2fcd-0571-3615-bc1c87107c55}">
+      <Declaration><![CDATA[PROPERTY Station : REFERENCE TO Test_Station]]></Declaration>
+      <Get Name="Get" Id="{5d74beaa-3167-0ec2-2db6-c089758b3fa6}">
+        <Declaration><![CDATA[VAR
+    _station : POINTER TO Test_Station;
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF __QUERYPOINTER(_Parent,_station) THEN // Check if _Parent is Station001
+	Station REF= _station^;              // If the check is successful dereference a pointer. simlar to THIS^ or SUPER^
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>

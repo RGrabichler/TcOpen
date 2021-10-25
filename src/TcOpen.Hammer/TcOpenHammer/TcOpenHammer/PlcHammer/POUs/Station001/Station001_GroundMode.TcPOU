@@ -5,6 +5,15 @@
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Method Name="InvokeSubSeqB" Id="{cd7d9771-d4ad-0388-2824-cf985c9232af}">
+      <Declaration><![CDATA[METHOD InvokeSubSeqB : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_subRoutineA_AutomatModeTask.Invoke();]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Main" Id="{67136693-3d1b-467a-9ae3-e25b070a14a4}">
       <Declaration><![CDATA[(*~
 	<docu>
@@ -103,5 +112,23 @@ END_IF]]></ST>
         </Implementation>
       </Get>
     </Property>
+    <Method Name="SubSeqA_AutoMode" Id="{7933d868-e7f0-0766-1863-d35e3b48fcf6}">
+      <Declaration><![CDATA[METHOD SubSeqA_AutoMode : bool
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _subRoutineA_AutomatModeTask.Execute() THEN
+    _subRoutineA_AutomatMode.Run();
+    _subRoutineA_AutomatModeTask.DoneWhen(_subRoutineA_AutomatMode.CurrentStep.ID = 400);
+    IF _subRoutineA_AutomatModeTask.Done THEN
+        _subRoutineA_AutomatMode.Restore();
+       
+	END_IF
+END_IF
+
+SubSeqA_AutoMode:= _subRoutineA_AutomatModeTask.Done;]]></ST>
+      </Implementation>
+    </Method>
   </POU>
 </TcPlcObject>

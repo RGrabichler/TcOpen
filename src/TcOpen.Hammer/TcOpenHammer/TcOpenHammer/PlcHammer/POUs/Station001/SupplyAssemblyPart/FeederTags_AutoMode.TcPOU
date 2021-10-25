@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FeederTags_AutoMode" Id="{b75dcf41-7fd1-0849-26ce-2a6dcc073f3f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FeederTags_AutoMode EXTENDS TcoCore.TcoSequencer
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Main" Id="{51f47f67-328f-0c25-1165-fc380fbb5e59}">
+      <Declaration><![CDATA[(*~
+	<docu>
+		<summary>
+			Main method of the sequener. Custom code needs to be placed here. The sequencer is executed by call of InstanceName.Run() method.
+			This method is abstract, and it must be overridden in derived block.
+		</summary>
+	</docu>
+~*)
+METHOD PROTECTED Main : BOOL
+VAR_INST
+    randomNrGen : Tc2_System.DRAND;
+    randNr : LREAL;
+    simTime : INT := 50 ;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// warten auf Startsignal via LightBarrier and/or other Status
+IF (Step(10, TRUE, 'Warte auf Start')) THEN
+    //StepCompleteWhen(gvl_status.StartFeedSeq);
+    StepCompleteWhen(THIS^.station._assemblyTask.Done);
+END_IF
+
+IF (step(100, TRUE, 'Klemm-Rechen klemmen')) THEN
+    //if Rail "left" or "right" active, move according Zyl
+    IF GVL_Status.RailLeft THEN
+        IF station.Components.ClampZylLeft.MoveToWork().Done THEN
+            StepCompleteWhen(station.Counter MOD simTime = 0);
+        END_IF
+    ELSE
+        IF station.Components.ClampZylRight.MoveToWork().Done THEN
+            StepCompleteWhen(station.Counter MOD simTime = 0);
+        END_IF
+    END_IF
+END_IF
+station.AssemblySequenc();
+
+IF (step(200, TRUE, 'Fixierung auf')) THEN
+    IF GVL_Status.RailLeft THEN
+        IF station.Components.FixZylLeft.MoveToHome().Done THEN
+            StepCompleteWhen(station.Counter MOD simTime = 0);
+        END_IF
+    ELSE
+        IF station.Components.FixZylRight.MoveToHome().Done THEN
+            StepCompleteWhen(station.Counter MOD simTime = 0);
+        END_IF
+    END_IF
+END_IF
+
+IF (step(300, TRUE, 'Vorschub aktiv')) THEN
+    IF station.Components.FeedingZyl.MoveToWork().Done THEN
+        StepCompleteWhen(station.Counter MOD simTime = 0);
+    END_IF
+END_IF
+
+IF (step(400, TRUE, 'Fixierung schließen')) THEN
+    IF GVL_Status.RailLeft THEN
+        IF station.Components.FixZylLeft.MoveToWork().Done THEN
+            StepCompleteWhen(station.Counter MOD simTime = 0);
+        END_IF
+    ELSE
+        IF station.Components.FixZylRight.MoveToWork().Done THEN
+            StepCompleteWhen(station.Counter MOD simTime = 0);
+        END_IF
+    END_IF
+END_IF
+
+IF (step(500, TRUE, 'Klemm-Rechen öffnen')) THEN
+    IF GVL_Status.RailLeft THEN
+        IF station.Components.ClampZylLeft.MoveToHome().Done THEN
+            StepCompleteWhen(station.Counter MOD simTime = 0);
+        END_IF
+    ELSE
+        IF station.Components.ClampZylRight.MoveToHome().Done THEN
+            StepCompleteWhen(station.Counter MOD simTime = 0);
+        END_IF
+    END_IF
+END_IF
+
+IF (step(600, TRUE, 'Vorschub Grundstellung')) THEN
+    IF station.Components.FeedingZyl.MoveToHome().Done THEN
+        StepCompleteWhen(station.Counter MOD simTime = 0);
+    END_IF
+END_IF
+
+IF (Step(850, TRUE, 'SAVE DATA')) THEN
+    //--------------------------------------------	
+    randomNrGen(seed := UDINT_TO_INT(station._counter), Num => randNr);
+    station.ProductionData.RFID_UID := LREAL_TO_UDINT((randNr) * 1000000000);
+
+    //What is this, how does it work??
+    StepCompleteWhen(Station.ProcessTraceAbility.Create(Identifier := ULINT_TO_STRING(THIS^.Context.RealTimeClock.TickClock())).Done);
+    //--------------------------------------------	
+END_IF
+
+IF (Step(1000, TRUE, 'SEQUENCE COMPLETE')) THEN
+    //--------------------------------------------
+    CompleteSequence();
+    //--------------------------------------------	
+END_IF;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OnStepCompleted" Id="{3ab541b3-fac4-0769-2282-4a788d138dfb}">
+      <Declaration><![CDATA[(*~
+	<docu>
+		<summary>
+			This method is executed upon step completion.
+			This method can be overridden in derived block by custom logic.
+		</summary>			
+	</docu>	
+~*)
+METHOD PROTECTED OnStepCompleted
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[station.Counter := 1;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Station" Id="{fff31330-c859-0fbb-2a32-2587ace27e43}">
+      <Declaration><![CDATA[PROPERTY Station : REFERENCE to FeederTags]]></Declaration>
+      <Get Name="Get" Id="{82480185-98ee-09f1-2929-0fe8a1dc971b}">
+        <Declaration><![CDATA[VAR
+    _station : pointer to FeederTags;
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF __QUERYPOINTER(_Parent, _station) THEN // Check if _Parent is Station001
+    Station REF= _station^; // If the check is successful dereference a pointer. simlar to THIS^ or SUPER^
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>
